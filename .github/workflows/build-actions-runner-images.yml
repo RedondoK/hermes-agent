@@ -1,0 +1,31 @@
+name: Build runner images
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+  push:
+    branches:
+      - build-custom-runner-images
+
+jobs: 
+  build-custom-image:
+    strategy:
+      matrix:
+        base-image: [windows-latest-32-core, windows-32-arm-core]
+    name: build custom ${{ matrix.base-image }} image
+    runs-on: ${{ matrix.base-image }}
+    snapshot:
+      image-name: custom-${{ matrix.base-image }}
+      version: 1.*
+
+    steps:
+        - run: choco install nodejs --version=26
+        - run: choco install ripgrep --version=15.2
+        - run: choco install uv --version=0.12.3
+        - name: default to python 3.14
+          uses: actions/setup-python@v6
+          with:
+            python-version: 3.14
+
+      #- name: install git
+      #  run: choco install git --version=2.53
